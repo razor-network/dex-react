@@ -24,7 +24,7 @@ export interface TokenList extends SubscriptionsInterface<TokenDetails[]> {
   addToken: (params: AddTokenParams) => void
   addTokens: (params: AddTokensParams) => void
   hasToken: (params: HasTokenParams) => boolean
-
+  userTokens: (networkId: number) => TokenDetails[]
   persistTokens: (params: PersistTokensParams) => void
 }
 
@@ -84,6 +84,8 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
         tokenList,
         addOverrideToDisabledTokens(networkId),
       )
+
+      console.log(initialTokenList)
 
       tokenList.forEach(({ address }) => {
         this._tokenAddressNetworkSet.add(
@@ -149,15 +151,25 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
     if (addedTokens.length === 0) return
 
     const extendedTokens = TokenListApiImpl.extendTokensInList(addedTokens, addOverrideToDisabledTokens(networkId))
-
-    this._tokensByNetwork[networkId] = TokenListApiImpl.mergeTokenLists(
-      this._tokensByNetwork[networkId],
-      extendedTokens,
-    )
+    logDebug(extendedTokens)
+    logDebug(this._tokensByNetwork[networkId])
+    //this._tokensByNetwork[networkId] = TokenListApiImpl.mergeTokenLists(
+    //  this._tokensByNetwork[networkId],
+    //  extendedTokens,
+    //)
     this.persistNewUserTokens(addedTokens, networkId)
 
-    this.triggerSubscriptions(this._tokensByNetwork[networkId])
+    //this.triggerSubscriptions(this._tokensByNetwork[networkId])
   }
+
+  /**
+   * userTokens
+   */
+  public userTokens(networkId: number): TokenDetails[] {
+    const userToken = this.loadTokenList(networkId, 'user')
+    return userToken
+  }
+
   private loadTokenList(networkId: number, type: tokenListType): TokenDetails[] {
     const storageKey = TokenListApiImpl.getStorageKey(networkId, type)
     const listStringified = localStorage.getItem(storageKey)

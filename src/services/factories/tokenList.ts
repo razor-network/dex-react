@@ -13,7 +13,7 @@ export function getTokensFactory(factoryParams: {
   tcrApi?: TcrApi
   getTokenFromErc20: (params: TokenFromErc20Params) => Promise<TokenFromErc20>
 }): (networkId: number) => TokenDetails[] {
-  const { tokenListApi, exchangeApi, tcrApi, getTokenFromErc20 } = factoryParams
+  const { tokenListApi, exchangeApi, tcrApi } = factoryParams
 
   // Set containing ids for networks which we successfully updated the tokens from the contract
   const areTokensUpdated = new Set<number>()
@@ -103,11 +103,11 @@ export function getTokensFactory(factoryParams: {
     }
   }
 
-  async function getErc20DetailsOrAddress(networkId: number, tokenAddress: string): Promise<TokenFromErc20 | string> {
+  /*async function getErc20DetailsOrAddress(networkId: number, tokenAddress: string): Promise<TokenFromErc20 | string> {
     // Simple wrapper function to return original address instead of null for make logging easier
     const erc20Details = await getTokenFromErc20({ networkId, tokenAddress })
     return erc20Details || tokenAddress
-  }
+  }*/
 
   async function fetchAddressesAndIds(networkId: number, numTokens: number): Promise<Map<string, number>> {
     logDebug(`[tokenListFactory][${networkId}] Fetching addresses for ids from 0 to ${numTokens - 1}`)
@@ -168,7 +168,7 @@ export function getTokensFactory(factoryParams: {
       if (!localAddressesMap.has(tokenAddress)) {
         // New token not in our local list, fetch erc20 details for it
         logDebug(`[tokenListFactory][${networkId}] Address ${tokenAddress} with id ${id} not in local list, fetching`)
-        promises.push(getErc20DetailsOrAddress(networkId, tokenAddress))
+        // promises.push(getErc20DetailsOrAddress(networkId, tokenAddress))
       } else {
         // Token already exists, update id
         logDebug(`[tokenListFactory][${networkId}] Address ${tokenAddress} already in the list, updating id to ${id}`)

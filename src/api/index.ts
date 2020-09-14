@@ -2,7 +2,6 @@ import { Network } from 'types'
 import { WalletApiMock } from './wallet/WalletApiMock'
 import { WalletApiImpl, WalletApi } from './wallet/WalletApi'
 import { TokenListApiImpl, TokenList } from './tokenList/TokenListApi'
-import { TokenListApiMock } from './tokenList/TokenListApiMock'
 import { Erc20Api, Erc20ApiDependencies } from './erc20/Erc20Api'
 import { Erc20ApiMock } from './erc20/Erc20ApiMock'
 import { Erc20ApiProxy } from './erc20/Erc20ApiProxy'
@@ -117,12 +116,12 @@ function createExchangeApi(erc20Api: Erc20Api, injectedDependencies: DepositApiD
 function createTokenListApi(): TokenList {
   const networkIds = [Network.Mainnet, Network.Rinkeby]
 
-  let tokenListApi: TokenList
-  if (process.env.MOCK_TOKEN_LIST === 'true') {
-    tokenListApi = new TokenListApiMock(tokenList)
-  } else {
-    tokenListApi = new TokenListApiImpl({ networkIds, initialTokenList: CONFIG.initialTokenList })
-  }
+  //let tokenListApi: TokenList
+  //if (process.env.MOCK_TOKEN_LIST === 'true') {
+  //  tokenListApi = new TokenListApiMock(tokenList)
+  //} else {
+  const tokenListApi = new TokenListApiImpl({ networkIds, initialTokenList: CONFIG.initialTokenList })
+  //}
 
   window['tokenListApi'] = tokenListApi // register for convenience
   return tokenListApi

@@ -34,12 +34,12 @@ const Trades = React.lazy(() =>
   ),
 )
 
-const Strategies = React.lazy(() =>
+/*const Strategies = React.lazy(() =>
   import(
-    /* webpackChunkName: "Strategies_chunk"*/
+    webpackChunkName: "Strategies_chunk"
     'pages/Strategies'
   ),
-)
+)*/
 
 const Orders = React.lazy(() =>
   import(
@@ -98,6 +98,8 @@ const Router: typeof BrowserRouter & typeof HashRouter = (window as any).IS_IPFS
 function getInitialUrl(): string {
   assertNonNull(CONFIG.initialTokenSelection, 'initialTokenSelection config is required')
   const { sellToken: initialSellToken, receiveToken: initialReceiveToken } = CONFIG.initialTokenSelection
+  console.log(initialReceiveToken)
+  console.log(initialSellToken)
   assertNonNull(initialSellToken, 'sellToken is required in the initialTokenSelection config')
   assertNonNull(initialReceiveToken, 'receiveToken is required in the initialTokenSelection config')
   return '/trade/' + encodeSymbol(initialSellToken) + '-' + encodeSymbol(initialReceiveToken) + '?sell=0&price=0'
@@ -115,7 +117,7 @@ const App: React.FC = () => (
           <Switch>
             <PrivateRoute path="/orders" exact component={Orders} />
             <Route path="/trade/:buy-:sell" component={Trade} />
-            <PrivateRoute path="/liquidity" exact component={Strategies} />
+            {/*<PrivateRoute path="/liquidity" exact component={Strategies} />*/}
             <PrivateRoute path="/wallet" exact component={Wallet} />
             <Route path="/about" exact component={About} />
             <Route path="/faq" exact component={FAQ} />

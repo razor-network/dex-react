@@ -30,6 +30,10 @@ export class TokenListApiMock extends GenericSubscriptions<TokenDetails[]> imple
     return !!this._tokenList.find(({ address }) => address === tokenAddress)
   }
 
+  public userTokens(_networkId: number): TokenDetails[] {
+    return this._tokenList
+  }
+
   public persistTokens({ tokenList }: PersistTokensParams): void {
     this._tokenList = tokenList
     this.triggerSubscriptions(tokenList)

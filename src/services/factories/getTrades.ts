@@ -4,7 +4,7 @@ import { calculatePrice } from '@gnosis.pm/dex-js'
 import { TokenDetails } from 'types'
 
 import { ExchangeApi, Trade, TradeReversion, Order, AuctionElement, BaseTradeEvent } from 'api/exchange/ExchangeApi'
-
+import { tokenListApi } from 'api'
 import { getTokensFactory } from 'services/factories/tokenList'
 import { addUnlistedTokensToUserTokenListByIdFactory } from 'services/factories/addUnlistedTokensToUserTokenListById'
 
@@ -53,13 +53,32 @@ export function getTradesAndTradeReversionsFactory(factoryParams: {
     blockTimes: Map<number, number>,
     orders: Map<string, Order>,
     tokens: Map<number, TokenDetails>,
+    networkId: number,
   ): Promise<Trade[]> {
     return events.map<Trade>((event) => {
+
+      const userTokens = networkId ? new Map(tokenListApi.userTokens(networkId).map((token) => [token.id, token])) : null
+
       const timestamp = blockTimes.get(event.blockNumber) as number
       const batchId = dateToBatchId(timestamp)
 
-      const buyToken = tokens.get(event.buyTokenId) as TokenDetails
-      const sellToken = tokens.get(event.sellTokenId) as TokenDetails
+      let buyToken
+      let sellToken
+
+      if((tokens.get(event.sellTokenId) as TokenDetails)===undefined && userTokens!==null) {
+        sellToken = userTokens.get(event.sellTokenId) as TokenDetails
+      }
+      else{
+        sellToken = tokens.get(event.sellTokenId) as TokenDetails
+      }
+
+      if((tokens.get(event.buyTokenId) as TokenDetails)===undefined && userTokens!==null){
+        buyToken = userTokens.get(event.buyTokenId) as TokenDetails
+      }
+      else{
+        buyToken = tokens.get(event.buyTokenId) as TokenDetails
+      }
+
 
       // Maybe we couldn't find the order /shrug
       const order = orders.get(event.orderId)
@@ -201,7 +220,7 @@ export function getTradesAndTradeReversionsFactory(factoryParams: {
     // ### TRADES and TRADE REVERSIONS ###
     // Final step, put all together
     const [trades, reverts] = await Promise.all<Trade[], TradeReversion[]>([
-      assembleTrades(tradeEvents, blockTimes, orders, tokens),
+      assembleTrades(tradeEvents, blockTimes, orders, tokens, networkId),
       assembleTradeReversions(tradeReversionEvents, blockTimes),
     ])
 
