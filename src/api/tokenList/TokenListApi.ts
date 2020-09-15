@@ -76,7 +76,6 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
       const tokenList = TokenListApiImpl.mergeTokenLists(
         // load first the local lists, as they might be more up to date
         this.loadTokenList(networkId, 'service'),
-        this.loadTokenList(networkId, 'user'),
         // then default list
         getTokensByNetwork(networkId, initialTokenList),
       )
@@ -84,8 +83,6 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
         tokenList,
         addOverrideToDisabledTokens(networkId),
       )
-
-      console.log(initialTokenList)
 
       tokenList.forEach(({ address }) => {
         this._tokenAddressNetworkSet.add(
@@ -190,12 +187,12 @@ export class TokenListApiImpl extends GenericSubscriptions<TokenDetails[]> imple
 
   public persistTokens({ networkId, tokenList }: PersistTokensParams): void {
     // fetch list of user added tokens
-    const userAddedTokens = this.loadTokenList(networkId, 'user')
-
-    const extendedTokens = TokenListApiImpl.extendTokensInList(tokenList, addOverrideToDisabledTokens(networkId))
+    //const userAddedTokens = this.loadTokenList(networkId, 'user')
+//
+    this._tokensByNetwork[networkId] = TokenListApiImpl.extendTokensInList(tokenList, addOverrideToDisabledTokens(networkId))
 
     // update copy in memory, appending anything user might have added
-    this._tokensByNetwork[networkId] = TokenListApiImpl.mergeTokenLists(extendedTokens, userAddedTokens)
+    //this._tokensByNetwork[networkId] = TokenListApiImpl.mergeTokenLists(extendedTokens, userAddedTokens)
 
     // update copy in local storage for service tokens
     const serviceStorageKey = TokenListApiImpl.getStorageKey(networkId, 'service')
